@@ -1,4 +1,7 @@
 - hosts: workstation
   become: yes
   roles:
-    - osp-servers
+    - {role: osp-servers, osp_server: "{{ osp_servers['frontend'] }}"}
+    - {role: osp-servers, osp_server: "{{ osp_servers['app1'] }}"}
+    - {role: osp-servers, osp_server: "{{ osp_servers['app2'] }}"}
+    - {role: osp-servers, osp_server: "{{ osp_servers['db'] }}"}
