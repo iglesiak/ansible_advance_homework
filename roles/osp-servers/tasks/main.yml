@@ -5,7 +5,9 @@
     cloud: ospcloud
     name: "{{ osp_server['name'] }}"
     image: rhel-guest
-    meta: "group={{ osp_server['meta'][0]['group'] }},deployment_name={{ osp_server['meta'][0]['deployment_name'] }}"
+    meta:
+      group: "{{ osp_server['meta'][0]['group'] }}"
+      deployment_name: "{{ osp_server['meta'][0]['deployment_name'] }}"
     flavor: "{{ osp_server['flavor'] }}"
     security_groups: "{{ osp_server['security_group'] }}"
     key_name: ansible_ssh
@@ -18,7 +20,8 @@
       cat /tmp/openstack.pub >> /home/cloud-user/.ssh/authorized_keys
       curl -o /tmp/internal.repo http://www.opentlc.com/download/ansible_bootcamp/repo/internal.repo
       cp /tmp/internal.repo /etc/yum.repos.d/internal.repo
-- name: Add floating IP to Servers
+    state: present
+- name: Add floating IP {{ server_floating_ip.floating_ip.floating_ip_address }} to Server
   os_floating_ip:
     cloud: ospcloud
     state: present
