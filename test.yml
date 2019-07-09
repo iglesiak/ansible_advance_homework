@@ -1,0 +1,8 @@
+---
+- hosts: all
+  tasks:
+    - command: systemctl status httpd
+      register: stat
+
+    - debug:
+        var: stat
