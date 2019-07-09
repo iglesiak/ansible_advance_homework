@@ -21,7 +21,7 @@
       curl -o /tmp/internal.repo http://www.opentlc.com/download/ansible_bootcamp/repo/internal.repo
       cp /tmp/internal.repo /etc/yum.repos.d/internal.repo
     state: present
-- name: Add floating IP {{ server_floating_ip.floating_ip.floating_ip_address }} to Server
+- name: Add floating IP to Server
   os_floating_ip:
     cloud: ospcloud
     state: present
