@@ -1,2 +1,73 @@
 ---
 # tasks file for db-tier
+- name: Ensure PostgreSQL packages are installed
+  package:
+    name: "{{ item }}"
+    state: installed
+
+- name: Ensure PostgreSQL Python libraries are installed
+  package:
+    name: "{{ item }}"
+    state: installed
+
+- name: Set environment variables
+  template:
+    src: postgres.sh.j2
+    dest: /etc/profile.d/postgres.sh
+    mode: 0644
+  notify: Restart postgresql
+
+- name: Check if data directory exists
+  file:
+    path: "{{ postgresql_data }}"
+    owner: "{{ postgresql_user  }}"
+    group: "{{ postgresl_group }}"
+    state: directory
+    mode: 0700
+
+- name: Check if db is initialized
+  stat:
+    path: "{{postgresql_data }}/PG_VERSION"
+  register: postgresql_version
+
+- name: Ensure db is initialized
+  command: "{{ postgresql_bin }}/initdb -D {{ postgresql_data  }}"
+  when: not postgresql_version.stat.exists
+  become: yes
+  become_user: "{{ postgresql_user }}"
+  vars:
+    ansible_ssh_pipelining: true
+
+- name: Configure global settings
+  lineinfile:
+    dest: "{{ postgresql_config }}/postgresql.conf"
+    regexp: "^#?{{ item.option }}.+$"
+    line: "{{ item.option }} = '{{ item.value }}'"
+    state: "{{ item.state | default('present') }}"
+  with_items: "{{ postgresql_global_config_options }}"
+  notify: Restart postgresql
+
+- name: Configure host based authentication
+  template:
+    src: pg_hba.conf.j2
+    dest: "{{ postgresql_config }}/pg_hba.conf"
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_group }}"
+    mode: 0600
+  notify: Restart postgresql
+  when: postgresql_hba_entries
+
+- name: Ensure unix socket dirs exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_group }}"
+    mode: 02775
+  with_items: "{{ postgresql_unix_socket_directories }}"
+
+- name: Ensure postgresql is started and enabled on boot
+  service:
+    name: "{{ postgresql_daemon }}"
+    state: started
+    enabled: yes
