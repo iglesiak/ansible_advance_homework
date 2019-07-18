@@ -22,7 +22,7 @@
   file:
     path: "{{ postgresql_data }}"
     owner: "{{ postgresql_user  }}"
-    group: "{{ postgresl_group }}"
+    group: "{{ postgresql_group }}"
     state: directory
     mode: 0700
 
