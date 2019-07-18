@@ -4,7 +4,7 @@
   package:
     name: "{{ item }}"
     state: installed
-  with_items: postgresql_packages
+  with_items: "{{ postgresql_packages }}"
 
 - name: Ensure PostgreSQL Python libraries are installed
   package:
