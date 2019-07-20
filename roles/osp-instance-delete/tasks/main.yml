@@ -6,7 +6,7 @@
       region_name: RegionOne
     register: result
 #  - name: Delete instances
-    with_items: "{{ result.ansible_facts.openstack_servers }}"
+#    with_items: "{{ result.ansible_facts.openstack_servers }}"
   - debug:
       var: result
    
